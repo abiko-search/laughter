@@ -1,0 +1,3 @@
+[submodule "c_src/lol-html"]
+	path = c_src/lol-html
+	url = https://github.com/cloudflare/lol-html
