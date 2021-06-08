@@ -1,5 +1,7 @@
 # Laughter
 
+![](https://github.com/dannote/tongue/workflows/Elixir%20CI/badge.svg)
+
 A streaming HTML parser for Elixir built on top of the CloudFlare's 😂 [LOL HTML](https://github.com/cloudflare/lol-html)
 
 ## Usage

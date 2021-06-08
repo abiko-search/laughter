@@ -13,10 +13,10 @@ ERL_LDFLAGS ?= -L$(ERL_EI_LIBDIR)
 LDFLAGS += -fPIC -shared
 CFLAGS ?= -fPIC -O2 -Wall -Wextra -Wno-unused-parameter
 
-ifeq ($(CROSSCOMPILE),)
 ifeq ($(shell uname),Darwin)
-LDFLAGS += -undefined dynamic_lookup
-endif
+LDFLAGS += -undefined dynamic_lookup $(LOLHTML_STATIC_LIB)
+else
+LDFLAGS += -Wl,--whole-archive $(LOLHTML_STATIC_LIB) -Wl,--no-whole-archive
 endif
 
 NIF=priv/laughter_nif.so
@@ -30,7 +30,8 @@ $(LOLHTML_STATIC_LIB):
 	cd $(LOLHTML_SRC_DIR) && cargo build --release --locked
 
 $(NIF): c_src/laughter_nif.c
-	$(CC) $(ERL_CFLAGS) $(CFLAGS) -I"$(LOLHTML_SRC_DIR)/include" $(LDFLAGS) $(ERL_LDFLAGS) $(LOLHTML_STATIC_LIB) -o $@ $<
+	$(CC) $(ERL_CFLAGS) $(CFLAGS) -I"$(LOLHTML_SRC_DIR)/include" \
+	$(LDFLAGS) $(ERL_LDFLAGS) -o $@ $<
 
 clean:
 	$(RM) $(NIF)
