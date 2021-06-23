@@ -44,7 +44,7 @@ defmodule Laughter do
   @doc """
   Parses a chunk.
   """
-  @spec parse(parser_ref, binary) :: parser_ref
+  @spec parse(parser_ref, iodata) :: parser_ref
   defdelegate parse(parser, chunk), to: Laughter.Nif
 
   @doc """

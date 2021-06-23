@@ -38,6 +38,19 @@ defmodule LaughterTest do
     assert_received {:end, ^div_ref}
   end
 
+  test "parses iodata" do
+    builder = Laughter.build()
+
+    div_ref = Laughter.stream_elements(builder, self(), "div")
+
+    builder
+    |> Laughter.create()
+    |> Laughter.parse(["<html>", "<body", ["><div class='REFBODY'></div></body></html>"]])
+    |> Laughter.done()
+
+    assert_received {:element, ^div_ref, {"div", [{"class", "REFBODY"}]}}
+  end
+
   test "raises exception on invalid selector" do
     builder = Laughter.build()
 

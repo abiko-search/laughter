@@ -167,7 +167,7 @@ static ERL_NIF_TERM laughter_parse_nif(ErlNifEnv *env, int argc,
                          (void **)&ctx))
     return enif_make_badarg(env);
 
-  if (!enif_inspect_binary(env, argv[1], &bin))
+  if (!enif_inspect_iolist_as_binary(env, argv[1], &bin))
     return enif_make_badarg(env);
 
   if (lol_html_rewriter_write(ctx->rewriter, (const char *)bin.data, bin.size))
