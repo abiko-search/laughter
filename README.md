@@ -27,7 +27,7 @@ iex> {:ok, {_, _, document}} = :httpc.request("https://en.wikipedia.org/wiki/The
 iex> builder = Laughter.build()
 #Reference<0.2639616589.3816685576.219236>
 
-iex> Laughter.stream_elements(builder, self(), "a.external.text")          
+iex> Laughter.filter(builder, self(), "a.external.text")          
 #Reference<0.2639616589.3816685576.219237>
 
 iex> builder

@@ -12,7 +12,7 @@ defmodule Laughter.Nif do
 
   def build(), do: :erlang.nif_error(:undef)
 
-  def stream_elements(_builder, _pid, _selector, _send_content), do: :erlang.nif_error(:undef)
+  def filter(_builder, _pid, _selector, _send_content), do: :erlang.nif_error(:undef)
 
   def create(_builder, _encoding, _max_memory), do: :erlang.nif_error(:undef)
 

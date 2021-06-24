@@ -65,8 +65,8 @@ static ERL_NIF_TERM laughter_build_nif(ErlNifEnv *env, int argc,
   return ret;
 }
 
-static ERL_NIF_TERM laughter_stream_elements_nif(ErlNifEnv *env, int argc,
-                                                 ERL_NIF_TERM const argv[]) {
+static ERL_NIF_TERM laughter_filter_nif(ErlNifEnv *env, int argc,
+                                        ERL_NIF_TERM const argv[]) {
   laughter_builder_ctx_t *ctx;
   laughter_handler_t *handler;
   lol_html_selector_t *selector;
@@ -332,8 +332,7 @@ static ERL_NIF_TERM raise_last_lol_html_error(ErlNifEnv *env) {
 
 static ErlNifFunc nif_functions[] = {
     {"build", 0, laughter_build_nif, ERL_NIF_DIRTY_JOB_CPU_BOUND},
-    {"stream_elements", 4, laughter_stream_elements_nif,
-     ERL_NIF_DIRTY_JOB_CPU_BOUND},
+    {"filter", 4, laughter_filter_nif, ERL_NIF_DIRTY_JOB_CPU_BOUND},
     {"create", 3, laughter_create_nif, ERL_NIF_DIRTY_JOB_CPU_BOUND},
     {"parse", 2, laughter_parse_nif, ERL_NIF_DIRTY_JOB_CPU_BOUND},
     {"done", 1, laughter_done_nif, ERL_NIF_DIRTY_JOB_CPU_BOUND},

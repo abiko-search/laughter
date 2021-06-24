@@ -18,10 +18,10 @@ defmodule Laughter do
 
   ## Examples
 
-      Laughter.stream_elements(builder, self(), ".content > a")
+      Laughter.filter(builder, self(), ".content > a")
   """
-  @spec stream_elements(builder_ref, pid, binary, boolean) :: reference
-  defdelegate stream_elements(builder, pid, selector, send_content \\ false), to: Laughter.Nif
+  @spec filter(builder_ref, pid, binary, boolean) :: reference
+  defdelegate filter(builder, pid, selector, send_content \\ false), to: Laughter.Nif
 
   @doc """
   Creates a parser from a parser builder.

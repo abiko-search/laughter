@@ -22,8 +22,8 @@ defmodule LaughterTest do
   test "sends parsed HTML" do
     builder = Laughter.build()
 
-    div_ref = Laughter.stream_elements(builder, self(), "div")
-    link_ref = Laughter.stream_elements(builder, self(), "a.centered")
+    div_ref = Laughter.filter(builder, self(), "div")
+    link_ref = Laughter.filter(builder, self(), "a.centered")
 
     builder
     |> Laughter.create()
@@ -41,7 +41,7 @@ defmodule LaughterTest do
   test "parses iodata" do
     builder = Laughter.build()
 
-    div_ref = Laughter.stream_elements(builder, self(), "div")
+    div_ref = Laughter.filter(builder, self(), "div")
 
     builder
     |> Laughter.create()
@@ -54,13 +54,13 @@ defmodule LaughterTest do
   test "raises exception on invalid selector" do
     builder = Laughter.build()
 
-    assert catch_error(Laughter.stream_elements(builder, self(), "#")) ==
+    assert catch_error(Laughter.filter(builder, self(), "#")) ==
              "The selector is empty."
   end
 
   test "raises exception when memory limit is exceeded" do
     builder = Laughter.build()
-    Laughter.stream_elements(builder, self(), "div")
+    Laughter.filter(builder, self(), "div")
     parser = Laughter.create(builder, max_memory: 5)
 
     assert catch_error(Laughter.parse(parser, @html)) == "The memory limit has been exceeded."
