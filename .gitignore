@@ -26,7 +26,8 @@ laughter-*.tar
 /tmp/
 
 # Compiled NIF
-/priv/*.so
+/priv/
+/native/*/target/
 
 # Clangd files
 /compile_commands.json

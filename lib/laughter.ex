@@ -6,6 +6,7 @@ defmodule Laughter do
 
   @type builder_ref :: reference
   @type parser_ref :: reference
+  @type filter_ref :: non_neg_integer
 
   @doc """
   Creates a parser builder.
@@ -16,12 +17,17 @@ defmodule Laughter do
   @doc """
   Selects which elements to stream and where to send them.
 
+  Returns a filter reference that will be included in messages.
+
   ## Examples
 
-      Laughter.filter(builder, self(), ".content > a")
+      ref = Laughter.filter(builder, self(), ".content > a")
+      # Messages will be: {:element, ref, {tag, attrs}}
   """
-  @spec filter(builder_ref, pid, binary, boolean) :: reference
-  defdelegate filter(builder, pid, selector, send_content \\ false), to: Laughter.Nif
+  @spec filter(builder_ref, pid, binary, boolean) :: filter_ref
+  def filter(builder, pid, selector, send_content \\ false) do
+    Laughter.Nif.filter(builder, pid, selector, send_content)
+  end
 
   @doc """
   Creates a parser from a parser builder.
@@ -42,14 +48,22 @@ defmodule Laughter do
   end
 
   @doc """
-  Parses a chunk.
+  Parses a chunk of HTML. Returns the parser for pipelining.
   """
   @spec parse(parser_ref, iodata) :: parser_ref
-  defdelegate parse(parser, chunk), to: Laughter.Nif
+  def parse(parser, chunk) when is_binary(chunk) do
+    Laughter.Nif.parse(parser, chunk)
+  end
+
+  def parse(parser, chunk) when is_list(chunk) do
+    Laughter.Nif.parse(parser, IO.iodata_to_binary(chunk))
+  end
 
   @doc """
-  Must be called once you are done.
+  Must be called once you are done parsing.
   """
-  @spec done(parser_ref) :: parser_ref
-  defdelegate done(parser), to: Laughter.Nif
+  @spec done(parser_ref) :: :ok
+  def done(parser) do
+    Laughter.Nif.done(parser)
+  end
 end

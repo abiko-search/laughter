@@ -1,0 +1,15 @@
+[package]
+name = "laughter_nif"
+version = "0.2.0"
+authors = ["Danila Poyarkov"]
+edition = "2021"
+
+[lib]
+name = "laughter_nif"
+path = "src/lib.rs"
+crate-type = ["cdylib"]
+
+[dependencies]
+rustler = "0.36"
+lol_html = "=2.6.0"
+encoding_rs = "0.8"

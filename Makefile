@@ -27,7 +27,7 @@ priv:
 	mkdir -p priv
 
 $(LOLHTML_STATIC_LIB):
-	cd $(LOLHTML_SRC_DIR) && cargo build --release --locked
+	cd $(LOLHTML_SRC_DIR) && cargo build --release
 
 $(NIF): c_src/laughter_nif.c
 	$(CC) $(ERL_CFLAGS) $(CFLAGS) -I"$(LOLHTML_SRC_DIR)/include" \
