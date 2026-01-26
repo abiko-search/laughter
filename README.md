@@ -1,6 +1,6 @@
 # Laughter
 
-[![CI](https://github.com/abiko-search/laughter/workflows/Elixir%20CI/badge.svg)](https://github.com/abiko-search/laughter/actions)
+[![CI](https://github.com/abiko-search/laughter/actions/workflows/elixir.yml/badge.svg)](https://github.com/abiko-search/laughter/actions/workflows/elixir.yml)
 
 A **streaming HTML parser** for Elixir built on top of CloudFlare's [LOL HTML](https://github.com/cloudflare/lol-html).
 
