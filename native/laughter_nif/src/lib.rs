@@ -6,13 +6,17 @@ use rustler::{Binary, Encoder, Env, LocalPid, NifResult, ResourceArc, Term};
 use std::sync::atomic::{AtomicU64, Ordering};
 use std::sync::{Arc, Mutex};
 
-mod atoms {
+mod rewriter;
+
+pub mod atoms {
     rustler::atoms! {
         ok,
         error,
         element,
         text,
         end,
+        done,
+        pending,
     }
 }
 
