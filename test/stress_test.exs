@@ -74,8 +74,7 @@ defmodule StressTest do
 
       html =
         1..100
-        |> Enum.map(fn i -> ~s(<div class="class#{i}">Content #{i}</div>) end)
-        |> Enum.join()
+        |> Enum.map_join("", fn i -> ~s(<div class="class#{i}">Content #{i}</div>) end)
 
       builder
       |> Laughter.create()

@@ -224,8 +224,7 @@ defmodule StreamingTest do
       # Generate HTML with many links
       links =
         1..1000
-        |> Enum.map(fn i -> ~s(<a href="/page#{i}">Link #{i}</a>) end)
-        |> Enum.join("\n")
+        |> Enum.map_join("\n", fn i -> ~s(<a href="/page#{i}">Link #{i}</a>) end)
 
       html = "<html><body>#{links}</body></html>"
 
