@@ -21,6 +21,7 @@ not arities; RustQ reads signatures and excludes the injected `Env` argument.
 Ownership, synchronization, buffering, and cancellation remain explicit Rust.
 
 ```sh
+export LAUGHTER_BUILD=1
 mix deps.get
 mix rustq.gen
 mix ci
@@ -31,21 +32,16 @@ cargo clippy --manifest-path native/laughter_nif/Cargo.toml --locked -- -D warni
 `mix ci` checks compilation, tests, generated-source freshness, Credo, Dialyzer,
 and duplication. See `test/README.md` in the repository for suite organization.
 
-## Package checks
+## Native builds and releases
 
-From a repository checkout:
+Consumers use precompiled NIFs by default. Set `LAUGHTER_BUILD=1` when developing
+from a checkout or changing Rust code so tests exercise the current sources.
 
-```sh
-mix hex.build --output /tmp/laughter.tar
-scripts/check-package.sh /tmp/laughter.tar
-```
-
-The script extracts the archive into a fresh consumer project, resolves consumer
-dependencies, compiles from scratch, and exercises parsing, callbacks, plans,
-streams, and sessions without RustQ. Its fixture is in
-`test/fixtures/package_consumer/`; the fixture and script are repository tooling,
-not part of the published package. CI is configured to test the same archive on
-Elixir 1.15/OTP 26 and Elixir 1.19/OTP 27.
+CI uses the shared `elixir-vibe/actions` Rustler workflow. It runs the full suite
+on Elixir 1.19/OTP 27 and checks production compilation on Elixir 1.15/OTP 26.
+Tag pushes use the shared precompilation workflow to attach native binaries to
+the GitHub Release. Download and commit their checksums before publishing to
+Hex; see `AGENTS.md` in the repository for the release sequence.
 
 ## Benchmarks and diagnostics
 

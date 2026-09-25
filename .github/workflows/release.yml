@@ -1,0 +1,20 @@
+name: Build precompiled NIFs
+
+on:
+  push:
+    tags: ["v*"]
+
+permissions:
+  contents: write
+  id-token: write
+  attestations: write
+  artifact-metadata: write
+
+jobs:
+  build_release:
+    uses: elixir-vibe/actions/.github/workflows/elixir-rustler-release.yml@v1
+    with:
+      project-name: laughter_nif
+      project-dir: native/laughter_nif
+      nif-versions: '["2.15"]'
+      cargo-args: --locked

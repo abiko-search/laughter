@@ -1,13 +1,14 @@
 defmodule Laughter.MixProject do
   use Mix.Project
 
+  @version "0.3.1"
+
   def project do
     [
       app: :laughter,
-      version: "0.3.0",
+      version: @version,
       elixir: "~> 1.15",
       start_permanent: Mix.env() == :prod,
-      test_ignore_filters: [~r"^test/fixtures/", ~r"_helper\.exs$"],
       deps: deps(),
       aliases: aliases(),
       description: description(),
@@ -37,7 +38,8 @@ defmodule Laughter.MixProject do
 
   defp deps do
     [
-      {:rustler, "~> 0.37", runtime: false},
+      {:rustler, "~> 0.37", optional: true, runtime: false},
+      {:rustler_precompiled, "~> 0.8"},
       {:rustq, "~> 1.0.0-rc.9", only: [:dev, :test], runtime: false},
       {:credo, "~> 1.7", only: ~w(dev test)a, runtime: false},
       {:dialyxir, "~> 1.4", only: :dev, runtime: false},
@@ -55,7 +57,7 @@ defmodule Laughter.MixProject do
     [
       name: :laughter,
       files:
-        ~w(lib codegen bench guides rustq.exs native/laughter_nif/src native/laughter_nif/Cargo.toml native/laughter_nif/Cargo.lock mix.exs README* CHANGELOG* LICENSE* .formatter.exs),
+        ~w(lib codegen bench guides rustq.exs native/laughter_nif/src native/laughter_nif/Cargo.toml native/laughter_nif/Cargo.lock native/laughter_nif/.cargo/config.toml mix.exs README* CHANGELOG* LICENSE* checksum-*.exs .formatter.exs),
       maintainers: ["Danila Poyarkov"],
       licenses: ["Apache-2.0"],
       links: %{"GitHub" => "https://github.com/abiko-search/laughter"}

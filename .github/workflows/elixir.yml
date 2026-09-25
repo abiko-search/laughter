@@ -1,59 +1,27 @@
 name: Elixir CI
 
-on: push
+on:
+  push:
+    branches: [master]
+  pull_request:
+
+permissions:
+  contents: read
 
 jobs:
-  build:
-    runs-on: ubuntu-latest
-    container:
-      image: elixir:1.19
-    steps:
-    - uses: actions/checkout@v4
-      with:
-        submodules: true
-    - name: Install Rust with generation and lint tools
-      uses: dtolnay/rust-toolchain@stable
-      with:
-        components: rustfmt, clippy
-    - name: Install dependencies
-      run: |
-        mix local.rebar --force
-        mix local.hex --force
-        mix deps.get
-    - name: Run project quality gates
-      run: mix ci
-    - name: Check documentation
-      run: mix docs --warnings-as-errors
-    - name: Check native code
-      run: cargo clippy --manifest-path native/laughter_nif/Cargo.toml -- -D warnings
-    - name: Build package archive
-      run: mix hex.build --output /tmp/laughter.tar
-    - uses: actions/upload-artifact@v4
-      with:
-        name: laughter-package
-        path: /tmp/laughter.tar
-
-  package-consumer:
-    needs: build
-    runs-on: ubuntu-22.04
-    strategy:
-      matrix:
-        include:
-          - elixir: '1.15.8'
-            otp: '26.2'
-          - elixir: '1.19.5'
-            otp: '27.3'
-    steps:
-    - uses: actions/checkout@v4
-    - uses: erlef/setup-beam@v1
-      with:
-        elixir-version: ${{ matrix.elixir }}
-        otp-version: ${{ matrix.otp }}
-    - uses: dtolnay/rust-toolchain@stable
-    - uses: actions/download-artifact@v4
-      with:
-        name: laughter-package
-    - name: Install Hex
-      run: mix local.hex --force
-    - name: Compile and exercise the packaged dependency without RustQ
-      run: scripts/check-package.sh laughter.tar
+  ci:
+    uses: elixir-vibe/actions/.github/workflows/elixir-rustler-ci.yml@v1
+    with:
+      latest-elixir: "1.19"
+      latest-otp: "27"
+      min-elixir: "1.15"
+      min-otp: "26"
+      rust-toolchain: "1.95.0"
+      rust-cache-workspaces: native/laughter_nif -> target
+      extra-env: LAUGHTER_BUILD=1
+      # RustQ is development-only and requires Elixir 1.19.
+      min-command: env MIX_ENV=prod mix compile --warnings-as-errors
+      latest-command: >-
+        env MIX_ENV=dev mix ci &&
+        env MIX_ENV=dev mix docs --warnings-as-errors &&
+        cargo clippy --manifest-path native/laughter_nif/Cargo.toml --locked -- -D warnings

@@ -32,7 +32,12 @@ end
 
 Then run `mix deps.get`. No Git submodules are needed.
 
-Consumers need Elixir 1.15+ (before 2.0) and Rust/Cargo for native compilation.
+Consumers need Elixir 1.15+ (before 2.0). Precompiled NIFs are provided for macOS
+(ARM64 and x86-64), Linux GNU (ARM64 and x86-64), and Linux musl (x86-64).
+These targets do not need Rust/Cargo.
+
+To compile from source, add `{:rustler, "~> 0.37", runtime: false}` to your
+dependencies and set `LAUGHTER_BUILD=1`. Source builds require Rust/Cargo.
 Contributing and regenerating the native boundary require a newer toolchain;
 see [Development](guides/development.md). RustQ is not a consumer dependency.
 

@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+## 0.3.1 - 2026-09-26
+
+### Added
+
+- Precompiled native binaries for macOS ARM64/x86-64, Linux GNU ARM64/x86-64, and Linux musl x86-64, removing the Rust/Cargo requirement on these targets. Set `LAUGHTER_BUILD=1` and add the optional `rustler` dependency to compile from source.
+
 ## 0.3.0 - 2026-09-25
 
 ### Breaking changes
