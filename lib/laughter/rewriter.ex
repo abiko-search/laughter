@@ -69,10 +69,23 @@ defmodule Laughter.Rewriter do
           }
   @type config :: t()
   @type handler_id :: non_neg_integer()
-  @type element_handler :: Legacy.element_handler()
-  @type text_handler :: Legacy.text_handler()
-  @type element_mutation :: Legacy.element_mutation()
-  @type text_mutation :: Legacy.text_mutation()
+  @type element_handler :: (String.t(), [{String.t(), String.t()}] -> [element_mutation()])
+  @type text_handler :: (String.t(), boolean() -> [text_mutation()])
+  @type element_mutation ::
+          :remove
+          | :noop
+          | {:set_attribute, String.t(), String.t()}
+          | {:remove_attribute, String.t()}
+          | {content_operation(), String.t()}
+  @type text_mutation ::
+          :remove
+          | :noop
+          | {:replace_html
+             | :replace_text
+             | :before_html
+             | :before_text
+             | :after_html
+             | :after_text, String.t()}
 
   @doc """
   Creates an empty plan without allocating native resources.

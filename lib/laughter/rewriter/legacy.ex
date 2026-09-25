@@ -2,34 +2,10 @@ defmodule Laughter.Rewriter.Legacy do
   @moduledoc false
   @type config :: reference()
   @type handler_id :: non_neg_integer()
-  @type element_handler :: (String.t(), [{String.t(), String.t()}] -> [element_mutation()])
-  @type text_handler :: (String.t(), boolean() -> [text_mutation()])
-  @type element_mutation ::
-          {:set_attribute, String.t(), String.t()}
-          | {:remove_attribute, String.t()}
-          | {:prepend_html, String.t()}
-          | {:prepend_text, String.t()}
-          | {:append_html, String.t()}
-          | {:append_text, String.t()}
-          | {:before_html, String.t()}
-          | {:before_text, String.t()}
-          | {:after_html, String.t()}
-          | {:after_text, String.t()}
-          | {:set_inner_html, String.t()}
-          | {:set_inner_text, String.t()}
-          | {:replace_html, String.t()}
-          | {:replace_text, String.t()}
-          | :remove
-          | :noop
-  @type text_mutation ::
-          {:replace_html, String.t()}
-          | {:replace_text, String.t()}
-          | {:before_html, String.t()}
-          | {:before_text, String.t()}
-          | {:after_html, String.t()}
-          | {:after_text, String.t()}
-          | :remove
-          | :noop
+  @type element_handler :: Laughter.Rewriter.element_handler()
+  @type text_handler :: Laughter.Rewriter.text_handler()
+  @type element_mutation :: Laughter.Rewriter.element_mutation()
+  @type text_mutation :: Laughter.Rewriter.text_mutation()
   @doc "Create a new rewriter configuration."
   @spec new(keyword()) :: config()
   def new(opts \\ []) do
