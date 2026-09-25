@@ -22,19 +22,15 @@ calls. Native buffer limits do not bound total application memory.
 
 ## Installation
 
-**0.3.0 is prepared but not yet published.** To try these APIs now, use a local
-checkout containing the 0.3.0 changes:
+Add Laughter to your dependencies:
 
 ```elixir
 def deps do
-  [{:laughter, path: "../laughter"}]
+  [{:laughter, "~> 0.3.0"}]
 end
 ```
 
-A Git dependency can be used once the changes are available remotely; pin a
-commit or tag for reproducibility. Git dependencies do not select a release from
-a Hex version requirement. No Git submodules are needed by the current native
-crate.
+Then run `mix deps.get`. No Git submodules are needed.
 
 Consumers need Elixir 1.15+ (before 2.0) and Rust/Cargo for native compilation.
 Contributing and regenerating the native boundary require a newer toolchain;
