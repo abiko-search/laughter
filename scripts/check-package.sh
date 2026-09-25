@@ -15,7 +15,8 @@ tar -xzf "$work/envelope/contents.tar.gz" -C "$work/package"
 for file in lib/laughter/nif/generated_stubs.ex \
   native/laughter_nif/src/generated_rewrite.rs \
   native/laughter_nif/src/generated_events.rs \
-  native/laughter_nif/Cargo.lock CHANGELOG.md bench/README.md; do
+  native/laughter_nif/Cargo.lock CHANGELOG.md bench/README.md \
+  guides/parsing.md guides/rewriting.md guides/sessions.md guides/development.md; do
   test -f "$work/package/$file" || { echo "Missing packaged file: $file" >&2; exit 1; }
 done
 if find "$work/package" -type f | grep -E '/(_build|deps|target|priv)/|\.(so|dylib|dll)$'; then

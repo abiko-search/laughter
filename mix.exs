@@ -12,7 +12,20 @@ defmodule Laughter.MixProject do
       aliases: aliases(),
       description: description(),
       package: package(),
-      name: "Laughter"
+      name: "Laughter",
+      docs: [
+        main: "readme",
+        extras: [
+          "README.md",
+          "guides/parsing.md",
+          "guides/rewriting.md",
+          "guides/sessions.md",
+          "guides/development.md",
+          "CHANGELOG.md",
+          {"LICENSE", [title: "License"]},
+          {"bench/README.md", [filename: "benchmarks", title: "Benchmarks"]}
+        ]
+      ]
     ]
   end
 
@@ -42,7 +55,7 @@ defmodule Laughter.MixProject do
     [
       name: :laughter,
       files:
-        ~w(lib codegen bench rustq.exs native/laughter_nif/src native/laughter_nif/Cargo.toml native/laughter_nif/Cargo.lock mix.exs README* CHANGELOG* LICENSE* .formatter.exs),
+        ~w(lib codegen bench guides rustq.exs native/laughter_nif/src native/laughter_nif/Cargo.toml native/laughter_nif/Cargo.lock mix.exs README* CHANGELOG* LICENSE* .formatter.exs),
       maintainers: ["Danila Poyarkov"],
       licenses: ["Apache-2.0"],
       links: %{"GitHub" => "https://github.com/abiko-search/laughter"}
