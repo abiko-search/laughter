@@ -1,4 +1,4 @@
-defmodule StreamingTest do
+defmodule Laughter.StreamingTest do
   use ExUnit.Case
 
   describe "streaming parsing" do

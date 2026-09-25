@@ -1,4 +1,4 @@
-defmodule RewriterTest do
+defmodule Laughter.Rewriter.LegacyTest do
   use ExUnit.Case
 
   alias Laughter.Rewriter
@@ -12,6 +12,7 @@ defmodule RewriterTest do
           {"href", href} ->
             new_href = String.replace(href, ".onion", ".example.com")
             [{:set_attribute, "href", new_href}]
+
           _ ->
             []
         end
@@ -70,6 +71,7 @@ defmodule RewriterTest do
         case List.keyfind(attrs, "href", 0) do
           {"href", href} ->
             [{:set_attribute, "href", href <> "?proxy=1"} | mutations]
+
           _ ->
             mutations
         end

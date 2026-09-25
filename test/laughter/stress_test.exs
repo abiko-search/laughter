@@ -1,4 +1,4 @@
-defmodule StressTest do
+defmodule Laughter.StressTest do
   use ExUnit.Case
 
   @moduletag timeout: 60_000
