@@ -23,7 +23,8 @@ defmodule Laughter.MixProject do
 
   defp deps do
     [
-      {:rustler, "~> 0.36"},
+      {:rustler, "~> 0.37", runtime: false},
+      {:rustq, "~> 1.0.0-rc.9", only: [:dev, :test], runtime: false},
       {:credo, "~> 1.7", only: ~w(dev test)a, runtime: false},
       {:dialyxir, "~> 1.4", only: :dev, runtime: false},
       {:ex_doc, "~> 0.34", only: :dev, runtime: false},
@@ -39,7 +40,8 @@ defmodule Laughter.MixProject do
   defp package do
     [
       name: :laughter,
-      files: ~w(lib native/laughter_nif/src native/laughter_nif/Cargo.toml native/laughter_nif/Cargo.lock mix.exs README* LICENSE* .formatter.exs),
+      files:
+        ~w(lib codegen rustq.exs native/laughter_nif/src native/laughter_nif/Cargo.toml native/laughter_nif/Cargo.lock mix.exs README* LICENSE* .formatter.exs),
       maintainers: ["Danila Poyarkov"],
       licenses: ["Apache-2.0"],
       links: %{"GitHub" => "https://github.com/abiko-search/laughter"}
@@ -47,12 +49,15 @@ defmodule Laughter.MixProject do
   end
 
   defp aliases do
-    [ci: [
-      "compile --warnings-as-errors",
-      "cmd MIX_ENV=test mix test",
-      "credo --strict --min-priority high",
-      "dialyzer",
-      "ex_dna"
-    ]]
+    [
+      ci: [
+        "compile --warnings-as-errors",
+        "cmd env MIX_ENV=test mix test",
+        "cmd mix rustq.gen --check",
+        "credo --strict --min-priority high",
+        "dialyzer",
+        "ex_dna"
+      ]
+    ]
   end
 end

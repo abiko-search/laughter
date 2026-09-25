@@ -6,7 +6,7 @@ jobs:
   build:
     runs-on: ubuntu-latest
     container:
-      image: elixir:1.18
+      image: elixir:1.19
     steps:
     - uses: actions/checkout@v4
       with:
@@ -20,3 +20,7 @@ jobs:
         mix deps.get
     - name: Run tests
       run: mix test
+    - name: Check generated native bridge
+      run: mix rustq.gen --check
+    - name: Check native code
+      run: cargo clippy --manifest-path native/laughter_nif/Cargo.toml -- -D warnings

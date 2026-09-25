@@ -210,7 +210,7 @@ pub fn rewriter_write(
         ..Settings::new_for_handler_types()
     };
 
-    let sink: Box<dyn FnMut(&[u8]) + Send> = Box::new(move |bytes: &[u8]| {
+    let sink: crate::OutputSink = Box::new(move |bytes: &[u8]| {
         output_clone.lock().unwrap().extend_from_slice(bytes);
     });
 

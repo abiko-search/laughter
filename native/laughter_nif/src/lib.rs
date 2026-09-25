@@ -8,6 +8,10 @@ use std::sync::atomic::{AtomicU64, Ordering};
 use std::sync::{Arc, Mutex};
 
 mod rewriter;
+mod plan;
+mod plan_stream;
+mod plan_dynamic;
+mod diagnostics;
 
 pub mod atoms {
     rustler::atoms! {
@@ -19,6 +23,8 @@ pub mod atoms {
         end,
         done,
         pending,
+        laughter_native,
+        output,
     }
 }
 
@@ -55,7 +61,8 @@ struct SelectorConfig {
     document: bool,
 }
 
-type SendableRewriter = HtmlRewriter<'static, Box<dyn FnMut(&[u8]) + Send>>;
+type OutputSink = Box<dyn FnMut(&[u8]) + Send>;
+type SendableRewriter = HtmlRewriter<'static, OutputSink>;
 
 struct Rewriter {
     inner: Mutex<Option<SendableRewriter>>,
@@ -272,7 +279,7 @@ fn create(
         ..Settings::new_for_handler_types()
     };
 
-    let output_sink: Box<dyn FnMut(&[u8]) + Send> = Box::new(|_| {});
+    let output_sink: OutputSink = Box::new(|_| {});
     let rewriter = HtmlRewriter::new(settings, output_sink);
 
     Ok(ResourceArc::new(Rewriter {

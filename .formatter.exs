@@ -1,3 +1,3 @@
 [
-  inputs: ["{mix,.formatter}.exs", "{config,lib,test}/**/*.{ex,exs}"]
+  inputs: ["{mix,rustq,.formatter}.exs", "{codegen,config,lib,test}/**/*.{ex,exs}"]
 ]
