@@ -20,6 +20,10 @@ Mirror the implementation path and namespace where possible:
   they observe VM-global state. Other suites retain their existing async behavior.
 - Keep helpers local unless multiple suites genuinely need the same abstraction.
 
+`test/fixtures/package_consumer/` is a standalone project for archive validation,
+not another test case in this project. `scripts/check-package.sh` copies it to a
+fresh temporary directory and runs `smoke.exs` against extracted package sources.
+
 Run a feature or layer directly:
 
 ```sh

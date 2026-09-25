@@ -4,9 +4,10 @@ defmodule Laughter.MixProject do
   def project do
     [
       app: :laughter,
-      version: "0.2.0",
+      version: "0.3.0",
       elixir: "~> 1.15",
       start_permanent: Mix.env() == :prod,
+      test_ignore_filters: [~r"^test/fixtures/", ~r"_helper\.exs$"],
       deps: deps(),
       aliases: aliases(),
       description: description(),
@@ -34,14 +35,14 @@ defmodule Laughter.MixProject do
   end
 
   defp description do
-    "A streaming HTML parser for Elixir built on top of CloudFlare's LOL HTML"
+    "A streaming HTML parser and rewriter for Elixir, powered by LOL HTML"
   end
 
   defp package do
     [
       name: :laughter,
       files:
-        ~w(lib codegen rustq.exs native/laughter_nif/src native/laughter_nif/Cargo.toml native/laughter_nif/Cargo.lock mix.exs README* LICENSE* .formatter.exs),
+        ~w(lib codegen bench rustq.exs native/laughter_nif/src native/laughter_nif/Cargo.toml native/laughter_nif/Cargo.lock mix.exs README* CHANGELOG* LICENSE* .formatter.exs),
       maintainers: ["Danila Poyarkov"],
       licenses: ["Apache-2.0"],
       links: %{"GitHub" => "https://github.com/abiko-search/laughter"}
