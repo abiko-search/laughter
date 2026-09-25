@@ -19,14 +19,60 @@ defmodule Laughter do
 
   Returns a filter reference that will be included in messages.
 
+  The fourth argument is either the legacy `send_content` boolean or a
+  keyword list:
+
+    * `:text` - also send the text inside matched elements as
+      `{:text, ref, content}`. Defaults to `false`.
+    * `:end_tag` - send `{:end_tag, ref, tag}` when a matched element's
+      explicit end tag is seen. Elements closed implicitly (an unclosed
+      `<p>` followed by another `<p>`) never produce one. Defaults to `false`.
+    * `:raw_text` - with `:text`, also deliver the contents of `<script>`,
+      `<style>`, and similar raw-text elements. Defaults to `false`, so only
+      visible text and the contents of `<title>` and `<textarea>` are sent.
+
   ## Examples
 
       ref = Laughter.filter(builder, self(), ".content > a")
       # Messages will be: {:element, ref, {tag, attrs}}
+
+      ref = Laughter.filter(builder, self(), "p", text: true, end_tag: true)
+      # Messages: {:element, ref, {"p", attrs}}, {:text, ref, "..."}, {:end_tag, ref, "p"}
   """
-  @spec filter(builder_ref, pid, binary, boolean) :: filter_ref
-  def filter(builder, pid, selector, send_content \\ false) do
-    Laughter.Nif.filter(builder, pid, selector, send_content)
+  @spec filter(builder_ref, pid, binary, boolean | keyword) :: filter_ref
+  def filter(builder, pid, selector, opts \\ false)
+
+  def filter(builder, pid, selector, send_content) when is_boolean(send_content) do
+    filter(builder, pid, selector, text: send_content)
+  end
+
+  def filter(builder, pid, selector, opts) when is_list(opts) do
+    Laughter.Nif.filter(
+      builder,
+      pid,
+      selector,
+      Keyword.get(opts, :text, false),
+      Keyword.get(opts, :end_tag, false),
+      Keyword.get(opts, :raw_text, false)
+    )
+  end
+
+  @doc """
+  Streams every text chunk in the document, whatever element it is in.
+
+  Returns a filter reference; messages are `{:text, ref, content}` and, at
+  the end, `{:end, ref}`. Unlike `filter/4` with `text: true` on `body`, this
+  fires exactly once per chunk and works on documents that omit `<body>`.
+  Contents of `<script>`, `<style>`, and other raw-text elements are skipped
+  unless `raw_text: true`; `<title>` and `<textarea>` text is included.
+
+  ## Examples
+
+      ref = Laughter.document_text(builder, self())
+  """
+  @spec document_text(builder_ref, pid, keyword) :: filter_ref
+  def document_text(builder, pid, opts \\ []) do
+    Laughter.Nif.document_text(builder, pid, Keyword.get(opts, :raw_text, false))
   end
 
   @doc """

@@ -1,5 +1,6 @@
 //! Laughter NIF - Streaming HTML parser using lol-html
 
+use lol_html::html_content::{EndTag, TextType};
 use lol_html::send::{HtmlRewriter, Settings};
 use lol_html::{AsciiCompatibleEncoding, MemorySettings};
 use rustler::{Binary, Encoder, Env, LocalPid, NifResult, ResourceArc, Term};
@@ -14,6 +15,7 @@ pub mod atoms {
         error,
         element,
         text,
+        end_tag,
         end,
         done,
         pending,
@@ -33,6 +35,10 @@ enum Message {
         filter_id: u64,
         content: String,
     },
+    EndTag {
+        filter_id: u64,
+        tag: String,
+    },
 }
 
 struct RewriterBuilder {
@@ -44,6 +50,9 @@ struct SelectorConfig {
     selector: String,
     pid: LocalPid,
     send_text: bool,
+    end_tag: bool,
+    raw_text: bool,
+    document: bool,
 }
 
 type SendableRewriter = HtmlRewriter<'static, Box<dyn FnMut(&[u8]) + Send>>;
@@ -73,6 +82,8 @@ fn filter(
     pid: LocalPid,
     selector: String,
     send_text: bool,
+    end_tag: bool,
+    raw_text: bool,
 ) -> NifResult<u64> {
     // Check for empty selector (lol-html panics on empty selectors)
     if selector.is_empty() || selector.trim().is_empty() {
@@ -96,6 +107,38 @@ fn filter(
         selector,
         pid,
         send_text,
+        end_tag,
+        raw_text,
+        document: false,
+    });
+
+    Ok(filter_id)
+}
+
+/// Register a handler for every text chunk in the document, whatever
+/// element it is in. Unlike a selector's text handler it fires once per
+/// chunk, and it works on documents that omit `<body>`.
+#[rustler::nif]
+fn document_text(
+    builder: ResourceArc<RewriterBuilder>,
+    pid: LocalPid,
+    raw_text: bool,
+) -> NifResult<u64> {
+    let filter_id = FILTER_COUNTER.fetch_add(1, Ordering::SeqCst);
+
+    let mut selectors = builder
+        .selectors
+        .lock()
+        .map_err(|_| rustler::Error::Term(Box::new("lock poisoned")))?;
+
+    selectors.push(SelectorConfig {
+        filter_id,
+        selector: String::new(),
+        pid,
+        send_text: true,
+        end_tag: false,
+        raw_text,
+        document: true,
     });
 
     Ok(filter_id)
@@ -123,11 +166,37 @@ fn create(
     let messages: Arc<Mutex<Vec<(LocalPid, Message)>>> = Arc::new(Mutex::new(Vec::new()));
 
     let mut element_handlers = Vec::new();
+    let mut document_handlers = Vec::new();
 
-    for config in selectors.iter() {
+    for config in selectors.iter().filter(|c| c.document) {
+        let filter_id = config.filter_id;
+        let pid = config.pid;
+        let raw_text = config.raw_text;
+        let doc_msgs = Arc::clone(&messages);
+
+        document_handlers.push(lol_html::doc_text!(move |text_chunk| {
+            let visible = matches!(text_chunk.text_type(), TextType::Data | TextType::RCData);
+            if !raw_text && !visible {
+                return Ok(());
+            }
+
+            let content = text_chunk.as_str().to_string();
+            if !content.is_empty() {
+                doc_msgs
+                    .lock()
+                    .unwrap()
+                    .push((pid, Message::Text { filter_id, content }));
+            }
+            Ok(())
+        }));
+    }
+
+    for config in selectors.iter().filter(|c| !c.document) {
         let filter_id = config.filter_id;
         let pid = config.pid;
         let send_text = config.send_text;
+        let end_tag = config.end_tag;
+        let raw_text = config.raw_text;
         let selector = config.selector.clone();
         let msgs = Arc::clone(&messages);
 
@@ -147,12 +216,39 @@ fn create(
                     attrs,
                 },
             ));
+
+            // Opt-in: report the explicit end tag of this element. lol-html
+            // does not run these for implicitly closed elements.
+            if end_tag {
+                if let Some(handlers) = el.end_tag_handlers() {
+                    let end_msgs = Arc::clone(&msgs);
+                    let handler: lol_html::send::EndTagHandler<'static> =
+                        Box::new(move |end: &mut EndTag<'_>| -> lol_html::HandlerResult {
+                            end_msgs.lock().unwrap().push((
+                                pid,
+                                Message::EndTag {
+                                    filter_id,
+                                    tag: end.name(),
+                                },
+                            ));
+                            Ok(())
+                        });
+                    handlers.push(handler);
+                }
+            }
             Ok(())
         }));
 
         if send_text {
             let text_msgs = Arc::clone(&messages);
             element_handlers.push(lol_html::text!(selector, move |text_chunk| {
+                // Visible text only unless raw_text: script, style, and CDATA
+                // contents are not content.
+                let visible = matches!(text_chunk.text_type(), TextType::Data | TextType::RCData);
+                if !raw_text && !visible {
+                    return Ok(());
+                }
+
                 let content = text_chunk.as_str().to_string();
                 if !content.is_empty() {
                     text_msgs
@@ -167,6 +263,7 @@ fn create(
 
     let settings = Settings {
         element_content_handlers: element_handlers,
+        document_content_handlers: document_handlers,
         memory_settings: MemorySettings {
             max_allowed_memory_usage: max_memory,
             ..Default::default()
@@ -212,6 +309,9 @@ fn send_messages(env: Env, rewriter: &Rewriter) -> NifResult<()> {
             }
             Message::Text { filter_id, content } => {
                 (atoms::text(), filter_id, content).encode(env)
+            }
+            Message::EndTag { filter_id, tag } => {
+                (atoms::end_tag(), filter_id, tag).encode(env)
             }
         };
 

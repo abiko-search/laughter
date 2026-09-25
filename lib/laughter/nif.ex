@@ -6,7 +6,10 @@ defmodule Laughter.Nif do
     crate: :laughter_nif
 
   def build(), do: :erlang.nif_error(:nif_not_loaded)
-  def filter(_builder, _pid, _selector, _send_content), do: :erlang.nif_error(:nif_not_loaded)
+  def filter(_builder, _pid, _selector, _send_content, _end_tag, _raw_text),
+    do: :erlang.nif_error(:nif_not_loaded)
+
+  def document_text(_builder, _pid, _raw_text), do: :erlang.nif_error(:nif_not_loaded)
   def create(_builder, _encoding, _max_memory), do: :erlang.nif_error(:nif_not_loaded)
   def parse(_parser, _binary), do: :erlang.nif_error(:nif_not_loaded)
   def done(_parser), do: :erlang.nif_error(:nif_not_loaded)
